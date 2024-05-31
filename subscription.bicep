@@ -26,7 +26,7 @@ param networkWatcherRGRegion string = ''
 /*** VARIABLES ***/
 
 @description('This region is used as the default for all generic resource groups and for any additional deployment resources. No resources are actually deployed to this resource group.')
-var deploymentResourceRegion = 'centralus' 
+var deploymentResourceRegion = 'usgovvirginia' 
 
 /*** EXISTING RESOURCES ***/
 
