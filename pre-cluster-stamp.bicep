@@ -209,6 +209,7 @@ resource peCr 'Microsoft.Network/privateEndpoints@2022-05-01' = {
 */
 
 
+/*
   resource pdzg 'privateDnsZoneGroups' = {
     name: 'for-${acr.name}'
     properties: {
@@ -221,8 +222,10 @@ resource peCr 'Microsoft.Network/privateEndpoints@2022-05-01' = {
         }
       ]
     }
-  }
+  }  */
 }
+
+
 
 @description('The scheduled query that returns images being imported from repositories different than quarantine/')
 resource sqrNonQuarantineImportedImgesToCr 'Microsoft.Insights/scheduledQueryRules@2022-06-15' = {

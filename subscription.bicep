@@ -443,21 +443,14 @@ module defenderPolicyDeployment 'modules/subscriptionPolicyAssignment.bicep' = {
     }
 }
 
-@description('Enable Microsoft Defender Standard for Key Vault. Requires Owner or Security Admin role.')
-resource enableKeyVaultspricing 'Microsoft.Security/pricings@2018-06-01' = if (enableMicrosoftDefenderForCloud) {
-    name: 'KeyVaults'
-    properties: {
-        pricingTier: 'Standard'
-    }
-}
-
+/*
 @description('Enable Microsoft Defender Standard for Container Registry. Deprecated, please move to Defender for Containers. Requires Owner or Security Admin role.')
 resource enableContainerRegistry 'Microsoft.Security/pricings@2018-06-01' = if (enableMicrosoftDefenderForCloud) {
     name: 'ContainerRegistry'
     properties: {
         pricingTier: 'Standard'
     }
-}
+} */
 
 @description('Enable Microsoft Defender for Kubernetes Service. Deprecated, please move to Defender for Containers. Requires Owner or Security Admin role.')
 resource enableKubernetesService 'Microsoft.Security/pricings@2018-06-01' = if (enableMicrosoftDefenderForCloud) {

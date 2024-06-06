@@ -1,3 +1,4 @@
+
 targetScope = 'resourceGroup'
 
 /*** PARAMETERS ***/
@@ -17,33 +18,30 @@ param k8sControlPlaneAuthorizationTenantId string
 param appGatewayListenerCertificate string
 
 @allowed([
-  'australiaeast'
-  'canadacentral'
-  'centralus'
-  'eastus'
-  'eastus2'
-  'westus2'
-  'francecentral'
-  'germanywestcentral'
-  'northeurope'
-  'southafricanorth'
-  'southcentralus'
-  'uksouth'
-  'westeurope'
-  'japaneast'
-  'southeastasia'
+  'usgovvirginia'
+  'usgovtexas'
+  'usgovarizona' 
 ])
+
+
+
 @description('AKS Service, Node Pools, and supporting services (KeyVault, App Gateway, etc) region. This needs to be the same region as the vnet provided in these parameters.')
 @minLength(4)
-param location string = 'eastus2'
+param location string = 'usgovvirginia'
 
+/* 
 @description('The Azure resource ID of a VM image that will be used for the jump box.')
 @minLength(70)
 param jumpBoxImageResourceId string
 
+
+
+
 @description('A cloud init file (starting with #cloud-config) as a base 64 encoded string used to perform image customization on the jump box VMs. Used for user-management in this context.')
 @minLength(100)
 param jumpBoxCloudInitAsBase64 string
+*/
+
 
 @description('Your cluster will be bootstrapped from this git repo.')
 @minLength(9)
@@ -55,7 +53,9 @@ param gitOpsBootstrappingRepoBranch string = 'main'
 
 /*** VARIABLES ***/
 
-var kubernetesVersion = '1.27.3'
+// var kubernetesVersion = '1.27.3'
+
+var kubernetesVersion = '1.28.9'
 
 var subRgUniqueString = uniqueString('aks', subscription().subscriptionId, resourceGroup().id)
 var clusterName = 'aks-${subRgUniqueString}'
@@ -150,10 +150,14 @@ resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   }
 }
 
+
 resource pdzMc 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
   scope: spokeResourceGroup
-  name: 'privatelink.${location}.azmk8s.io'
-}
+  // name: 'privatelink.${location}.cx.aks.containerservice.azure.us'
+  // name: 'privatelink.${location}.azmk8s.io'
+  name: 'privatelink.${location}.cx.aks.containerservice.azure.us'
+} 
+
 
 @description('Used as primary entry point for workload. Expected to be assigned to an Azure Application Gateway.')
 resource pipPrimaryCluster 'Microsoft.Network/publicIPAddresses@2022-05-01' existing = {
@@ -599,6 +603,8 @@ resource agw_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-0
   }
 }
 
+ 
+/*
 @description('The compute for operations jumpboxes; these machines are assigned to cluster operator users')
 resource vmssJumpboxes 'Microsoft.Compute/virtualMachineScaleSets@2020-12-01' = {
   name: 'vmss-jumpboxes'
@@ -719,6 +725,7 @@ resource vmssJumpboxes 'Microsoft.Compute/virtualMachineScaleSets@2020-12-01' = 
   }
 }
 
+*/ 
 resource paAksLinuxRestrictive 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
   name: guid(psdAKSLinuxRestrictiveId, resourceGroup().name, clusterName)
   properties: {
@@ -726,7 +733,7 @@ resource paAksLinuxRestrictive 'Microsoft.Authorization/policyAssignments@2021-0
     policyDefinitionId: psdAKSLinuxRestrictiveId
     parameters: {
       effect: {
-        value: 'audit'
+        value: 'Audit'
       }
       excludedNamespaces: {
         value: [
@@ -801,7 +808,7 @@ resource paMustUseSpecifiedLabels 'Microsoft.Authorization/policyAssignments@202
     policyDefinitionId: pdMustUseSpecifiedLabels
     parameters: {
       effect: {
-        value: 'audit'
+        value: 'Audit'
       }
       labelsList: {
         value: [
@@ -841,7 +848,7 @@ resource paApprovedContainerPortsOnly 'Microsoft.Authorization/policyAssignments
     policyDefinitionId: pdApprovedContainerPortsOnly
     parameters: {
       effect: {
-        value: 'audit'
+        value: 'Audit'
       }
       excludedNamespaces: {
         value: []
@@ -871,7 +878,7 @@ resource paApprovedServicePortsOnly 'Microsoft.Authorization/policyAssignments@2
     policyDefinitionId: pdApprovedServicePortsOnly
     parameters: {
       effect: {
-        value: 'audit'
+        value: 'Audit'
       }
       excludedNamespaces: {
         value: [
@@ -899,7 +906,7 @@ resource paRoRootFilesystem 'Microsoft.Authorization/policyAssignments@2020-09-0
     policyDefinitionId: pdRoRootFilesystemId
     parameters: {
       effect: {
-        value: 'audit'
+        value: 'Audit'
       }
       // Not all workloads support this. E.g. ASP.NET requires a non-readonly root file system to handle request buffering when there is memory pressure.
       excludedNamespaces: {
@@ -935,7 +942,7 @@ resource paEnforceResourceLimits 'Microsoft.Authorization/policyAssignments@2020
     policyDefinitionId: pdEnforceResourceLimitsId
     parameters: {
       effect: {
-        value: 'audit'
+        value: 'Audit'
       }
       cpuLimit: {
         value: '1500m'
@@ -1261,7 +1268,7 @@ resource mc 'Microsoft.ContainerService/managedClusters@2022-10-02-preview' = {
     paEnforceResourceLimits
     paEnforceImageSource
 
-    vmssJumpboxes // Ensure jumboxes are available to use as soon as possible, don't wait until cluster is created.
+  // vmssJumpboxes // Ensure jumboxes are available to use as soon as possible, don't wait until cluster is created.
   ]
 }
 

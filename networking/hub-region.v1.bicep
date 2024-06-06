@@ -464,9 +464,11 @@ resource imageBuilder_ipgroups 'Microsoft.Network/ipGroups@2021-05-01' = {
   name: 'ipg-${location}-AksJumpboxImageBuilders'
   location: location
   properties: {
-    ipAddresses: [
+    ipAddresses: [      
       aksImageBuilderSubnet.properties.addressPrefix
+      //'10.0.1.0/24'
     ]
+    
   }
 }
 

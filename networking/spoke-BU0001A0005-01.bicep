@@ -11,7 +11,7 @@ param hubVnetResourceId string
     'usgovtexas'
     'usgovarizona' 
   ])
-  
+
 
 @description('The spokes\'s regional affinity, must be the same as the hub\'s location. All resources tied to this spoke will also be homed in this region. The network team maintains this approved regional list which is a subset of zones with Availability Zone support.')
 param location string
@@ -807,7 +807,7 @@ module hubsSpokesPeering 'modules/hubsSpokesPeeringDeployment.bicep' = {
 
 @description('Enables Azure Container Registry Private Link on vnet.')
 resource acrPrivateDnsZones 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-    name: 'privatelink.azurecr.io'
+    name: 'privatelink.azurecr.us'
     location: 'global'
     properties: {}
 }
@@ -840,7 +840,8 @@ resource acrPrivateDnsZones_virtualNetworkLink_toHubVNet 'Microsoft.Network/priv
 
 @description('Enables AKS Private Link on vnet.')
 resource aksPrivateDnsZones 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-    name: 'privatelink.${location}.azmk8s.io'
+    // name: 'privatelink.${location}.azmk8s.us'
+    name: 'privatelink.${location}.cx.aks.containerservice.azure.us'    
     location: 'global'
     properties: {}
 }
